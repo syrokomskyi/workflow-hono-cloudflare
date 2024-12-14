@@ -29,7 +29,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
       async () => {
         // Do stuff here, with access to the state from our previous steps
         if (Math.random() > 0.5) {
-          throw new Error("API call to $STORAGE_SYSTEM failed");
+          throw new Error("API call failed. This is a test error.");
         }
       },
     );
