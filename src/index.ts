@@ -1,5 +1,4 @@
 import {
-  DurableObject,
   WorkflowEntrypoint,
   type WorkflowEvent,
   type WorkflowStep,
@@ -7,7 +6,6 @@ import {
 
 type Env = {
   // Add your bindings here, e.g. Workers KV, D1, Workers AI, etc.
-  MY_DURABLE_OBJECT: DurableObjectNamespace<MyDurableObject>;
   MY_WORKFLOW: Workflow;
 };
 
@@ -23,34 +21,6 @@ type Env = {
  *
  * Learn more at https://developers.cloudflare.com/durable-objects
  */
-
-/** A Durable Object's behavior is defined in an exported Javascript class */
-export class MyDurableObject extends DurableObject {
-  readonly name: string;
-
-  /**
-   * The constructor is invoked once upon creation of the Durable Object, i.e. the first call to
-   * 	`DurableObjectStub::get` for a given identifier (no-op constructors can be omitted)
-   *
-   * @param ctx - The interface for interacting with Durable Object state
-   * @param env - The interface to reference bindings declared in wrangler.toml
-   */
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-
-    this.name = `DO ${crypto.randomUUID()}`;
-  }
-
-  /**
-   * The Durable Object exposes an RPC method sayHello which will be invoked when when a Durable
-   *  Object instance receives a request from a Worker via the same method invocation on the stub
-   *
-   * @returns The greeting to be sent back to the Worker
-   */
-  async sayHello(): Promise<string> {
-    return `Hello, ${this.name}!`;
-  }
-}
 
 // Create your own class that implements a Workflow
 export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
@@ -121,22 +91,10 @@ export default {
     // Spawn a new instance and return the ID and status
     const instance = await env.MY_WORKFLOW.create();
 
-    // We will create a `DurableObjectId` using the pathname from the Worker request
-    // This id refers to a unique instance of our 'MyDurableObject' class above
-    const stateId = env.MY_DURABLE_OBJECT.idFromName(url.pathname);
-
-    // This stub creates a communication channel with the Durable Object instance
-    // The Durable Object constructor will be invoked upon the first call for a given id
-    const stub = env.MY_DURABLE_OBJECT.get(stateId);
-
     return Response.json({
       instance: {
         id: instance.id,
         details: await instance.status(),
-      },
-      state: {
-        id: stateId,
-        name: await stub.sayHello(),
       },
     });
   },
