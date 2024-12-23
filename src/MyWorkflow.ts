@@ -4,13 +4,16 @@ import {
   type WorkflowStep,
 } from "cloudflare:workers";
 
-// Create your own class that implements a Workflow
+// Create your own class that implements a Workflow.
 export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
   // Define a run() method
   async run(event: WorkflowEvent<Params>, step: WorkflowStep) {
+    console.log("event", event);
+    console.log("step", step);
+
     // Define one or more steps that optionally return state.
     const data = await step.do("my first step", async () => {
-      return [1, 2, 3];
+      return [11, 12, 13];
     });
 
     await step.sleep("wait on something", "20 seconds");
@@ -39,7 +42,7 @@ export class MyWorkflow extends WorkflowEntrypoint<Env, Params> {
         // Do something with your state
       }
 
-      return { completed: data };
+      return { final_data: data.sort((a, b) => b - a), event: event };
     });
   }
 }

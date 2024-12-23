@@ -4,6 +4,10 @@ export default {
   /**
    * This is the standard fetch handler for a Cloudflare Worker
    *
+   * Example:
+   *
+   * http://127.0.0.1:8787/?name=Andrii&age=47
+   *
    * @param request - The request submitted to the Worker from the client
    * @param env - The interface to reference bindings declared in wrangler.toml
    * @param ctx - The execution context of the Worker
@@ -16,7 +20,13 @@ export default {
     const id = url.searchParams.get("id");
     const instance = id
       ? await env.MY_WORKFLOW.get(id)
-      : await env.MY_WORKFLOW.create();
+      : await env.MY_WORKFLOW.create({
+          params: JSON.stringify({
+            name: url.searchParams.get("name"),
+            age: url.searchParams.get("age"),
+            timestamp: new Date().toISOString,
+          }),
+        });
 
     return Response.json({
       id: instance.id,
