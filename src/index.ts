@@ -1,4 +1,5 @@
-import { MyWorkflow } from "./MyWorkflow";
+import { MyWorkflow, type MyWorkflowParams } from "./MyWorkflow";
+import type { Env } from "./env";
 
 export default {
   /**
@@ -21,11 +22,10 @@ export default {
     const instance = id
       ? await env.MY_WORKFLOW.get(id)
       : await env.MY_WORKFLOW.create({
-          params: JSON.stringify({
-            name: url.searchParams.get("name"),
-            age: url.searchParams.get("age"),
-            timestamp: new Date().toISOString,
-          }),
+          params: {
+            name: url.searchParams.get("name") ?? "",
+            age: Number(url.searchParams.get("age") ?? 0),
+          },
         });
 
     return Response.json({
