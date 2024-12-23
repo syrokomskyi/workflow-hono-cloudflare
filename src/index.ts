@@ -1,4 +1,4 @@
-import { MyWorkflow, type MyWorkflowParams } from "./MyWorkflow";
+import { MyWorkflow } from "./MyWorkflow";
 import type { Env } from "./env";
 
 export default {
