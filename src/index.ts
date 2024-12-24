@@ -17,6 +17,11 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url);
 
+    // remove an annoying message in console
+    if (url.pathname.startsWith("/favicon")) {
+      return Response.json({}, { status: 404 });
+    }
+
     // Spawn a new instance or return the spawned early instance
     const id = url.searchParams.get("id");
     const instance = id
